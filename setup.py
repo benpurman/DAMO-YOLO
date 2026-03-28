@@ -5,11 +5,15 @@ import re
 from os import path
 
 import setuptools
-import torch
-from torch.utils.cpp_extension import CppExtension
 
-torch_ver = [int(x) for x in torch.__version__.split('.')[:2]]
-assert torch_ver >= [1, 7], 'Requires PyTorch >= 1.7'
+try:
+    import torch
+    from torch.utils.cpp_extension import BuildExtension
+    torch_ver = [int(x) for x in torch.__version__.split('.')[:2]]
+    assert torch_ver >= [1, 7], 'Requires PyTorch >= 1.7'
+    _torch_cmdclass = {'build_ext': BuildExtension}
+except ImportError:
+    _torch_cmdclass = {}
 
 
 with open('damo/__init__.py', 'r') as f:
@@ -36,6 +40,6 @@ setuptools.setup(
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent'
     ],
-    cmdclass={'build_ext': torch.utils.cpp_extension.BuildExtension},
+    cmdclass=_torch_cmdclass,
     packages=setuptools.find_packages(),
 )
